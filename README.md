@@ -1,56 +1,19 @@
-# Python software webauthn token
+This is the fork of [soft-webauthn](https://github.com/bodik/soft-webauthn) library to make it more usable in security testing. Some functionality was and will be altered thus any assumptions in interchangeability with the original library may be wrong.
 
-[![Build Status](https://travis-ci.org/bodik/soft-webauthn.svg?branch=master)](https://travis-ci.org/bodik/soft-webauthn)
+**Never use it in production.**
 
-Package is used for testing webauthn enabled web applications. The use-case is
-authenticator and browser emulation during web application development
-continuous integration.
+Improvements:
 
-`SoftWebauthnDevice` class interface exports basic navigator interface used for
-webauthn features:
+- Can store multiple keys. Implementation nearly stateless (stores only master key and global counter).
+- Can be pickled / unpickled.
+- Can be initialized with constant key.
+- Can easily extract private_key from `credential_id` (sometimes also referred as `key_id`).
 
-* `SoftWebauthnDevice.create(...)` aka `navigator.credentials.create(...)`
-* `SoftWebauthnDevice.get(...)` aka `navigator.credentials.get(...)`
+Limitations:
 
-To support authentication tests without prior registration/attestation, the
-class exports additional functions:
+- Supports only ES256 algorithm (aka `{'alg': -7}`).
+- Attestation is not supported.
+- Resident Keys are not supported.
+- Yeah, even timeouts are not supported.
+- Validation is poor and definetely not compliant with [W3C Recommendation](https://www.w3.org/TR/webauthn/).
 
-* `SoftWebauthnDevice.cred_init(rp_id, user_handle)`
-* `SoftWebauthnDevice.cred_as_attested()`
-
-There is no standard/specification for *Client* (browser) to *Relying party*
-(web application) communication. Therefore the class should be be used in a web
-application test suite along with other code handling webapp specific tasks
-such as conveying *CredentialCreationOptions* from webapp and
-*PublicKeyCredential* back to the webapp.
-
-The example usage can be found in `tests/test_interop.py` (Token/Client vs RP
-API) and `tests/test_example.py` (Token/Client vs RP HTTP). Despite internal
-usage of `yubico/python-fido2` package, the project should be usable againts
-other RP implementations as well.
-
-## References
-
-* https://w3c.github.io/webauthn
-* https://webauthn.guide/
-* https://github.com/Yubico/python-fido2
-
-## Development
-
-```
-git clone https://github.com/bodik/soft-webauthn
-cd soft-webauthn
-ln -s ../../git_hookprecommit.sh .git/hooks/pre-commit
-
-# OPTIONAL, create and activate virtualenv
-make venv
-. venv/bin/activate
-
-# install dependencies
-make install-deps
-
-# profit
-make lint
-make test
-make coverage
-```
