@@ -66,8 +66,8 @@ def test_example_server_authentication(client):  # pylint: disable=redefined-out
     # NOTE: the storage of the credential data on the RP side is not in scope
     # of Webauthn spec. Yubico example server uses module scoped variable.
     device = SoftWebauthnDevice()
-    device.cred_init('localhost', b'randomhandle')
-    tests.example_server.credentials = [device.cred_as_attested()]
+    credential_id, private_key = device.cred_init('localhost')
+    tests.example_server.credentials = [device.cred_as_attested(credential_id, private_key)]
 
     # Browser starts authentication by requesting
     # publicKeyCredentialRequestOptions (pkcro) from the RP.
@@ -86,7 +86,7 @@ def test_example_server_authentication(client):  # pylint: disable=redefined-out
         'clientDataJSON': assertion['response']['clientDataJSON'],
         'authenticatorData': assertion['response']['authenticatorData'],
         'signature': assertion['response']['signature'],
-        'userHandle': assertion['response']['userHandle']
+        # 'userHandle': assertion['response']['userHandle']
     })
     raw_response = client.post(
         '/api/authenticate/complete',

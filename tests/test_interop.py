@@ -33,8 +33,8 @@ def test_authenticate():
     """test authentication"""
 
     device = SoftWebauthnDevice()
-    device.cred_init('example.org', b'randomhandle')
-    registered_credential = device.cred_as_attested()
+    credential_id, private_key = device.cred_init('example.org')
+    registered_credential = device.cred_as_attested(credential_id, private_key)
 
     server = Fido2Server(PublicKeyCredentialRpEntity('example.org', 'test server'))
     options, state = server.authenticate_begin([registered_credential])

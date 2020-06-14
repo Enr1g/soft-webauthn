@@ -7,6 +7,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec
 from fido2.ctap2 import AttestedCredentialData
 from fido2.utils import sha256
+from base64 import urlsafe_b64encode
 
 from soft_webauthn import SoftWebauthnDevice
 
@@ -42,9 +43,9 @@ def test_as_attested_cred():
     """test straight credential generation and access"""
 
     device = SoftWebauthnDevice()
-    device.cred_init('rpid', b'randomhandle')
+    credential_id, private_key = device.cred_init('rpid')
 
-    assert isinstance(device.cred_as_attested(), AttestedCredentialData)
+    assert isinstance(device.cred_as_attested(credential_id, private_key), AttestedCredentialData)
 
 
 def test_create():
@@ -54,8 +55,10 @@ def test_create():
     attestation = device.create(PKCCO, 'https://example.org')
 
     assert attestation
-    assert device.private_key
-    assert device.rp_id == 'example.org'
+    assert attestation['response']['attestationObject']
+    assert attestation['id']
+    assert attestation['rawId']
+    assert urlsafe_b64encode(attestation['rawId']) == attestation['id']
 
 
 def test_create_not_supported_type():
@@ -84,12 +87,20 @@ def test_get():
     """test get"""
 
     device = SoftWebauthnDevice()
-    device.cred_init(PKCRO['publicKey']['rpId'], b'randomhandle')
+    credential_id, private_key = device.cred_init(PKCRO['publicKey']['rpId'])
 
-    assertion = device.get(PKCRO, 'https://example.org')
+    pkcro = copy.deepcopy(PKCRO)
+    pkcro['publicKey']['allowCredentials'] = [
+        {
+            "type": "public-key",
+            "id": credential_id
+        }
+    ]
+
+    assertion = device.get(pkcro, 'https://example.org')
 
     assert assertion
-    device.private_key.public_key().verify(
+    private_key.public_key().verify(
         assertion['response']['signature'],
         assertion['response']['authenticatorData'] + sha256(assertion['response']['clientDataJSON']),
         ec.ECDSA(hashes.SHA256())
@@ -100,9 +111,15 @@ def test_get_not_matching_rpid():
     """test get not mathcing rpid"""
 
     device = SoftWebauthnDevice()
-    device.cred_init('rpid', b'randomhandle')
+    credential_id, private_key = device.cred_init('rpid')
 
     pkcro = copy.deepcopy(PKCRO)
     pkcro['publicKey']['rpId'] = 'another_rpid'
+    pkcro['publicKey']['allowCredentials'] = [
+        {
+            "type": "public-key",
+            "id": credential_id
+        }
+    ]
     with pytest.raises(ValueError):
         device.get(pkcro, 'https://example.org')
