@@ -6,7 +6,7 @@ import pytest
 from fido2 import cbor
 
 import tests.example_server
-from soft_webauthn import SoftWebauthnDevice
+from webauthn_software_authenticator import SoftWebauthnDevice
 
 
 @pytest.fixture

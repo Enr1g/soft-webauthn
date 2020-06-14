@@ -9,7 +9,7 @@ from fido2.ctap2 import AttestedCredentialData
 from fido2.utils import sha256
 from base64 import urlsafe_b64encode
 
-from soft_webauthn import SoftWebauthnDevice
+from webauthn_software_authenticator import SoftWebauthnDevice
 
 
 # PublicKeyCredentialCreationOptions

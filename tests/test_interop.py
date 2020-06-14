@@ -5,7 +5,7 @@ from fido2.ctap2 import AttestationObject, AuthenticatorData
 from fido2.server import Fido2Server
 from fido2.webauthn import PublicKeyCredentialRpEntity
 
-from soft_webauthn import SoftWebauthnDevice
+from webauthn_software_authenticator import SoftWebauthnDevice
 
 
 def test_register():

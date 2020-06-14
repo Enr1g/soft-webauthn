@@ -1,18 +1,10 @@
 import setuptools
 
-with open('README.md', 'r') as fh:
-    long_description = fh.read()
-
 setuptools.setup(
-    name='soft-webauthn',
-    version='0.1.2',
-    author='Radoslav Bodó',
-    author_email='bodik@cesnet.cz',
-    description='Python webauthn software authenticator',
-    long_description=long_description,
-    long_description_content_type='text/markdown',
-    url='https://github.com/bodik/soft_webauthn',
-    py_modules=['soft_webauthn'],
+    name='webauthn-software-authenticator',
+    description='Python Software Authenticator for WebAuthn',
+    url='https://github.com/Enr1g/webauthn-software-authenticator',
+    py_modules=['webauthn_software_authenticator'],
     install_requires=[
         'fido2>=0.8',
         'cryptography'
