@@ -21,9 +21,8 @@ from fido2.utils import sha256
 
 class SoftWebauthnDevice():
     """
-    This simulates the Webauthn browser API with a authenticator device
-    connected. It's primary use-case is testing, device can hold only
-    one credential.
+    Class simulates the Webauthn browser API with a authenticator device
+    connected.
     """
     aaguid: bytes = b'\x00'*16
 
@@ -36,7 +35,7 @@ class SoftWebauthnDevice():
         self.sign_count: int = sign_count
 
     def cred_init(self, rp_id: str) -> (bytes, ec.EllipticCurvePrivateKey):
-        """initialize credential_id for rp_id and private_key"""
+        """Initialize credential_id for rp_id"""
 
         rp_id_hash = sha256(rp_id.encode())
         private_key = ec.generate_private_key(ec.SECP256R1(), default_backend())
@@ -52,6 +51,7 @@ class SoftWebauthnDevice():
         return credential_id, private_key
 
     def cred_extract(self, rp_id: str, credential_id: bytes) -> Optional[ec.EllipticCurvePrivateKey]:
+        """Extract private key from `credential_id`"""
         rp_id_hash = sha256(rp_id.encode())
 
         aesgcm = AESGCM(self.master_key)
@@ -65,7 +65,7 @@ class SoftWebauthnDevice():
             return None
 
     def cred_as_attested(self, credential_id: bytes, private_key: ec.EllipticCurvePrivateKey) -> AttestedCredentialData:
-        """return current credential as AttestedCredentialData"""
+        """Return current credential as AttestedCredentialData"""
 
         return AttestedCredentialData.create(
             self.aaguid,
@@ -74,7 +74,7 @@ class SoftWebauthnDevice():
         )
 
     def create(self, options: Dict[str, Any], origin: str) -> Dict[str, Any]:
-        """create credential and return PublicKeyCredential object aka attestation"""
+        """Create a new credential and return PublicKeyCredential object aka attestation"""
 
         if {'alg': -7, 'type': 'public-key'} not in options['publicKey']['pubKeyCredParams']:
             raise ValueError('Requested pubKeyCredParams does not contain supported type')
@@ -119,7 +119,7 @@ class SoftWebauthnDevice():
         }
 
     def get(self, options: Dict[str, Any], origin: str) -> Dict[str, Any]:
-        """get authentication credential aka assertion"""
+        """Get authenticator assertion response"""
 
         rp_id = options['publicKey']['rpId']
 
