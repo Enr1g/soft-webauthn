@@ -58,7 +58,7 @@ def test_create():
     assert attestation['response']['attestationObject']
     assert attestation['id']
     assert attestation['rawId']
-    assert urlsafe_b64encode(attestation['rawId']) == attestation['id']
+    assert urlsafe_b64encode(attestation['rawId']).decode() == attestation['id']
 
 
 def test_create_not_supported_type():

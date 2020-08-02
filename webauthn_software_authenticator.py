@@ -109,7 +109,7 @@ class SoftWebauthnDevice():
         }
 
         return {
-            'id': urlsafe_b64encode(credential_id),
+            'id': urlsafe_b64encode(credential_id).decode(),
             'rawId': credential_id,
             'response': {
                 'clientDataJSON': json.dumps(client_data).encode('utf-8'),
@@ -150,7 +150,7 @@ class SoftWebauthnDevice():
 
             # generate assertion
             return {
-                'id': urlsafe_b64encode(credential_id),
+                'id': urlsafe_b64encode(credential_id).decode(),
                 'rawId': credential_id,
                 'response': {
                     'authenticatorData': authenticator_data,
